@@ -87,7 +87,7 @@ The same thing can also be seen by using the browser embedded performance measur
 
 ## Step 2: Introducing components
 
-The menu in `src/Client/NavMenu/View.fs` is the first thing we'll refactor.
+The menu in `src/Client/NavMenu/View.fs` is the first thing we'll refactor by introducing components, it's not the part that slow down the page the most but it's very static and should never be updated between renders when the user doesn't interact with it.
 
 The most simple component can be `menuItemChannel`, the function can be replaced by a function-component:
 
@@ -111,7 +111,10 @@ menuItemChannel { ch = ch.Info; currentPage = currentPage }
 
 ### Tasks
 
-1. Replace the parts of the menu with components to have a nice tree with `Menu` > `AllChannels` > `Channels`, a component for the user block, ...<br/>
+1. Start with replacing `menuItemChannel` and looking at the differences in the React Dev Tools
+2. Replace the div with `fs-user` class with a component
+3. Replace the root and mainArea functions in `App/View.fs` with components
+4. Now that you have the trick do it for a more complex tree and replace the parts of the menu with components to have a nice tree with `Menu` > `AllChannels` > `Channels` as a hierarchy<br/>
    To help you, the props for `menu` are :
    ```fsharp
    type MenuProps = {
@@ -120,14 +123,13 @@ menuItemChannel { ch = ch.Info; currentPage = currentPage }
        dispatch: ChatServer.Types.Msg -> unit
    }
    ```
-2. Use `ofList` or `ofArray` functions with each element having a distinct `key: string` prop in all channels and user channels.
+5. Use `ofList` or `ofArray` functions with each element having a distinct `key: string` prop in "all channels" and "user channels".
 
 ## Step 3: The menu shouldn't re-render
 
-If you check the React Profiler, it's still re-rendering the menu
+If you check the React Profiler, it's still re-rendering the menu, something is still changing
 
-
-3. Measure the result with the profiler and notice that the joined channel list still update for each render.
+1. Measure the result with the profiler and notice that the joined channel list still update for each render.
 4. Search for the culprit (Or read the next line)
 5. The source is the messages themselves, but we actually don't need the full channel information for connected channels, only their `.Info` field. Change the props to reflect that.
 6. Measure again and check that the menu doesn't render anymore on each message

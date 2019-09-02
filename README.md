@@ -127,17 +127,23 @@ menuItemChannel { ch = ch.Info; currentPage = currentPage }
 
 ## Step 3: The menu shouldn't re-render
 
-If you check the React Profiler, it's still re-rendering the menu, something is still changing
+*You can fast-forward here by doing `git checkout workshop-step-2` or by looking at what you're missing in the [workshop-step-2](https://github.com/vbfox/SAFE-Chat-workshop/tree/workshop-step-2) branch*
 
-1. Measure the result with the profiler and notice that the joined channel list still update for each render.
+If you check the React Profiler, it's still re-rendering the menu, something is still changing in the props!
+
+![](menu_still_render.png)
+
+### Tasks
+
+1. Profile on your solution and check that it still render.
 4. Search for the culprit (Or read the next line)
-5. The source is the messages themselves, but we actually don't need the full channel information for connected channels, only their `.Info` field. Change the props to reflect that.
+5. The source is the messages themselves, but we actually don't need the full channel information for connected channels, only their `.Info` field. Change the props to reflect that, transforming the full model to a menu-oriented one.
 6. Measure again and check that the menu doesn't render anymore on each message
 7. You can also play with replacing `ByValue` with `ByRef` for some of the components to see the result.
 
-# Step 3: Rendering the messages with components
+## Step 4: Rendering the messages with components
 
-
+*You can fast-forward here by doing `git checkout workshop-step-3` or by looking at what you're missing in the [workshop-step-2](https://github.com/vbfox/SAFE-Chat-workshop/tree/workshop-step-3) branch*
 
 ## Acknowledgements
 

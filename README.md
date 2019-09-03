@@ -143,7 +143,51 @@ If you check the React Profiler, it's still re-rendering the menu, something is 
 
 ## Step 4: Rendering the messages with components
 
-*You can fast-forward here by doing `git checkout workshop-step-3` or by looking at what you're missing in the [workshop-step-2](https://github.com/vbfox/SAFE-Chat-workshop/tree/workshop-step-3) branch*
+*You can fast-forward here by doing `git checkout workshop-step-3` or by looking at what you're missing in the [workshop-step-3](https://github.com/vbfox/SAFE-Chat-workshop/tree/workshop-step-3) branch*
+
+It's now time to apply all of that to the messages themselves !
+
+### Task
+
+A single one, convert `src/Client/Channel/View.fs` up to the point where the `#viking` mode is fast enough to be usable.
+
+The react profiler should look something like this :
+
+![](react_profiler_after.png)
+
+Remarks:
+
+* You might have to limit the number of messages displayed if you want to keep performances in the long run. Without doing anything more, limiting to `1000` messages should give you very good performance if only one message really render in the DOM each time.
+* The times won't update correctly but you can ignore that as we'll tackle it in the next step.
+
+## Step 5: Let's remove a few function creations
+
+*You can fast-forward here by doing `git checkout workshop-step-2` or by looking at what you're missing in the [workshop-step-4](https://github.com/vbfox/SAFE-Chat-workshop/tree/workshop-step-4) branch*
+
+While it won't change our performance much here, let's remove the allocations generated each render when we generate the wrapped dispatch as it's a frequent source of allocations. The same method can also be reused in a lot more cases so it's generally useful.
+
+Code that wrap dispatch like that line in `src\Client\App\View.fs` :
+
+```fsharp
+dispatch = (ApplicationMsg >> ChatDataMsg >> dispatch)
+```
+
+will allocate 2 functions each time the application is rendered. But in Elmish dispatch always does the same thing, it doesn't functionally change between renders so we can actually cache the result and always reuse it. We could do it manually but let's use [`memoize-once`](https://www.npmjs.com/package/memoize-one) as it's a lot more useful.
+
+It memoize the result of a function for the latest arguments that were passed to it.
+
+A very useful usage is to generate what would be a ViewModel in MVVM, values computed directly from part of the model that only change when the model changes.
+
+### Task
+
+* `dispatch` isn't actually stable in our application (The object reference is different each render) because `toNavigableWith` in `Elmish.Navigation` has the same problem we have here it re-wrap it every time, so let's use a mutable variable to capture it once and reuse it. Optionally you can also PR the library 😉
+* `memoizeOnce` is already wrapped in the modified sample, and the javascript library imported, so use it on the various cases where dispatch is wrapped
+
+## Step 6: Virtualize the list
+
+That step is open-ended as I don't think we'll have time to go that far, but as the [Optimizing Performance](https://reactjs.org/docs/optimizing-performance.html#virtualize-long-lists) react documentation evoke, for very big lists virtualizing them (And ideally lazy-loading missing elements from the server) is a key optimization.
+
+react virtualized with CellMeasurer to handle dynamic height text and AutoSizer to size it would be a good start.
 
 ## Acknowledgements
 

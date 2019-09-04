@@ -41,8 +41,8 @@ To clear the server database (normally not needed): remove `src/Server/CHAT_DATA
 * React [Reconciliation](https://reactjs.org/docs/reconciliation.html) Guide
 * We'll also introduce the [state](https://reactjs.org/docs/hooks-state.html) and [effect](https://reactjs.org/docs/hooks-effect.html) hooks
 * [My PR to optimize the SAFE-BookStore sample](https://github.com/SAFE-Stack/SAFE-BookStore/pull/393)
-* My Fable:React blogs ([Part 1](https://blog.vbfox.net/2018/02/06/fable-react-1-react-in-fable-land.html) and [Part 2](https://blog.vbfox.net/2018/02/08/fable-react-2-optimizing-react.html))
-* My [Fable Conf 2018 Talk](https://www.youtube.com/watch?v=9VJoaNoutm4)
+* My Fable:React blogs ([Part 1](https://blog.vbfox.net/2018/02/06/fable-react-1-react-in-fable-land.html) and [Part 2](https://blog.vbfox.net/2018/02/08/fable-react-2-optimizing-react.html)) 🥚🐣🐤☠
+* My [FableConf 2018 Talk](https://www.youtube.com/watch?v=9VJoaNoutm4)
 
 ## The Workshop
 
@@ -163,11 +163,13 @@ Remarks:
 
 ## Step 5: Rendering the dates with useEffect and useState
 
+*You can fast-forward here by doing `git checkout workshop-step-4` or by looking at what you're missing in the [workshop-step-4](https://github.com/vbfox/SAFE-Chat-workshop/tree/workshop-step-4) branch*
+
 Now let's use [`useState`](https://reactjs.org/docs/hooks-state.html) and [`useEffect`](https://reactjs.org/docs/hooks-effect.html) react [hooks](https://reactjs.org/docs/hooks-intro.html) to solve our relative time display problem.
 
 ![](relative_time.png)
 
-Displaying relative times is a purely UI problem that has nothing to do with our model, and can use local state inside a component instead of relying on the elmish update model.
+Displaying relative times is a purely UI problem that has nothing to do with our model, and can use local state inside a component instead of relying on the Elmish update model.
 
 Hooks are a way to achieve that inside a functional react component and might completely replace the react class syntax in the long term.
 
@@ -198,11 +200,13 @@ let slowCounter = elmishView "SlowCounter" ByRef <| fun () ->
 
 ### Task
 
-Replace the time display that is currently buggy (because we never update the DOM as the date doesn't change) with a component displaying relative time using hooks
+Replace the time display that is currently buggy (because we never update the DOM as the date doesn't change) with a component displaying relative time using hooks.
+
+The easy way is to re-generate the time every ~20s via `setInterval` but you can also optimize even more by computing when the text will change and only schedule an update at this moment.
 
 ## Step 6: Let's remove a few function creations
 
-*You can fast-forward here by doing `git checkout workshop-step-2` or by looking at what you're missing in the [workshop-step-4](https://github.com/vbfox/SAFE-Chat-workshop/tree/workshop-step-4) branch*
+*You can fast-forward here by doing `git checkout workshop-step-5` or by looking at what you're missing in the [workshop-step-5](https://github.com/vbfox/SAFE-Chat-workshop/tree/workshop-step-5) branch*
 
 While it won't change our performance much here, let's remove the allocations generated each render when we generate the wrapped dispatch as it's a frequent source of allocations. The same method can also be reused in a lot more cases so it's generally useful.
 
@@ -259,7 +263,9 @@ let memoizeOnceTupled<'t>(value: 't): 't = memoizeOnceWithEquality(value, tupled
 
 ## Step 7: Virtualize the list
 
-That step is open-ended as I don't think we'll have time to go that far, but as the [Optimizing Performance](https://reactjs.org/docs/optimizing-performance.html#virtualize-long-lists) react documentation evoke, for very big lists virtualizing them (And ideally lazy-loading missing elements from the server) is a key optimization.
+*You can fast-forward here by doing `git checkout workshop-step-6` or by looking at what you're missing in the [workshop-step-6](https://github.com/vbfox/SAFE-Chat-workshop/tree/workshop-step-6) branch*
+
+That step is left as an exercise to the reader as I don't think we'll have time to go that far and didn't do it myself 😉, but as the [Optimizing Performance](https://reactjs.org/docs/optimizing-performance.html#virtualize-long-lists) react documentation evoke, for very big lists virtualizing them (And ideally lazy-loading missing elements from the server) is a key optimization.
 
 react virtualized with CellMeasurer to handle dynamic height text and AutoSizer to size it would be a good start.
 

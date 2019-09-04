@@ -159,8 +159,40 @@ Remarks:
 
 * You might have to limit the number of messages displayed if you want to keep performances in the long run. Without doing anything more, limiting to `1000` messages should give you very good performance if only one message really render in the DOM each time.
 * The times won't update correctly but you can ignore that as we'll tackle it in the next step.
+* If you navigate between channels you'll notice React errors in the console and weird things happening, let's find why and solve them.
 
-## Step 5: Let's remove a few function creations
+## Step 5: Rendering the dates with useEffect and useState
+
+Now let's use [`useState`](https://reactjs.org/docs/hooks-state.html) and [`useEffect`](https://reactjs.org/docs/hooks-effect.html) react [hooks](https://reactjs.org/docs/hooks-intro.html) to solve our relative time display problem.
+
+Displaying relative times is a purely UI problem that has nothing to do with our model, and can use local state inside a component instead of relying on the elmish update model.
+
+Hooks are a way to achieve that inside a functional react component and might completely replace the react class syntax in the long term.
+
+Here is a small example :
+```fsharp
+let private mkDisposable (f : unit -> unit): System.IDisposable =
+    { new System.IDisposable with member __.Dispose() = f() }
+
+let private useSlowCounter () =
+    let counterState = Hooks.useState<int> 0
+    Hooks.useEffectDisposable(fun () ->
+        let timeoutId = Browser.Dom.window.setInterval((fun () ->
+            counterState.update(counterState.current + 1)), 5000)
+        mkDisposable (fun () ->
+            Browser.Dom.window.clearInterval timeoutId))
+    counterState.current
+
+let slowCounter = elmishView "SlowCounter" ByRef <| fun () ->
+    let counter = useSlowCounter ()
+    span [Style [Color "red"; BackgroundColor "yellow"]] [ofInt counter]
+```
+
+### Task
+
+Replace the time display that is currently buggy (because we never update the DOM as the date doesn't change) with a component displaying relative time using hooks
+
+## Step 6: Let's remove a few function creations
 
 *You can fast-forward here by doing `git checkout workshop-step-2` or by looking at what you're missing in the [workshop-step-4](https://github.com/vbfox/SAFE-Chat-workshop/tree/workshop-step-4) branch*
 
@@ -183,7 +215,41 @@ A very useful usage is to generate what would be a ViewModel in MVVM, values com
 * `dispatch` isn't actually stable in our application (The object reference is different each render) because `toNavigableWith` in `Elmish.Navigation` has the same problem we have here it re-wrap it every time, so let's use a mutable variable to capture it once and reuse it. Optionally you can also PR the library 😉
 * `memoizeOnce` is already wrapped in the modified sample, and the javascript library imported, so use it on the various cases where dispatch is wrapped
 
-## Step 6: Virtualize the list
+### Remark
+
+As soon as you use it on a function taking more than one argument you'll see that it doesn't work due to the way fable compile and invoke functions. The easiest way to fix his is to use only tupled functions and this little helper that replace memoizeOnce comparison function:
+
+```fsharp
+[<ImportDefault("memoize-one")>]
+let memoizeOnceWithEquality<'t>(value: 't, equaliyFn: obj[] -> obj[] -> bool): 't = jsNative
+
+[<Emit("Array.isArray($0)")>]
+let private isArray (x: obj) = jsNative
+
+let inline private shallowArrayEquals (a: obj[]) (b: obj[]) =
+    if a.Length <> b.Length then
+        false
+    else
+        let mutable i = 0
+        let mutable equals = true
+        while i < a.Length && equals do
+            let valueA = a.[i]
+            let valueB = b.[i]
+            equals <- System.Object.ReferenceEquals(valueA, valueB)
+            i <- i + 1
+        equals
+
+let private tupledShallowArrayEquals (a: obj[]) (b: obj[]) =
+    if a.Length = 1 && b.Length = 1 && isArray a.[0] && isArray b.[0] then
+        shallowArrayEquals (unbox a.[0]) (unbox b.[0])
+    else
+        JS.console.error("tupledShallowArrayEquals called with non tupled arguments: ", a, b)
+        failwithf "tupledShallowArrayEquals called with non tupled arguments: %A, %A" a b
+
+let memoizeOnceTupled<'t>(value: 't): 't = memoizeOnceWithEquality(value, tupledShallowArrayEquals)
+```
+
+## Step 7: Virtualize the list
 
 That step is open-ended as I don't think we'll have time to go that far, but as the [Optimizing Performance](https://reactjs.org/docs/optimizing-performance.html#virtualize-long-lists) react documentation evoke, for very big lists virtualizing them (And ideally lazy-loading missing elements from the server) is a key optimization.
 

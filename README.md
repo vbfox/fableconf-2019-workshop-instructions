@@ -165,6 +165,8 @@ Remarks:
 
 Now let's use [`useState`](https://reactjs.org/docs/hooks-state.html) and [`useEffect`](https://reactjs.org/docs/hooks-effect.html) react [hooks](https://reactjs.org/docs/hooks-intro.html) to solve our relative time display problem.
 
+![](relative_time.png)
+
 Displaying relative times is a purely UI problem that has nothing to do with our model, and can use local state inside a component instead of relying on the elmish update model.
 
 Hooks are a way to achieve that inside a functional react component and might completely replace the react class syntax in the long term.
@@ -176,11 +178,17 @@ let private mkDisposable (f : unit -> unit): System.IDisposable =
 
 let private useSlowCounter () =
     let counterState = Hooks.useState<int> 0
-    Hooks.useEffectDisposable(fun () ->
-        let timeoutId = Browser.Dom.window.setInterval((fun () ->
-            counterState.update(counterState.current + 1)), 5000)
-        mkDisposable (fun () ->
-            Browser.Dom.window.clearInterval timeoutId))
+    Hooks.useEffectDisposable(
+        (fun () ->
+            let timeoutId = Browser.Dom.window.setInterval((fun () ->
+                // We can't use the counterState.current value here as we don't declare any dependencies, we need to use
+                // the functional update form that uses a function taking the current value instead.
+                counterState.update (fun x -> x + 1)), 5000)
+            mkDisposable (fun () ->
+                Browser.Dom.window.clearInterval timeoutId)),
+        // The empty array as a second parameter is important it tell react that we don't have any dependencies,
+        //  without it the effect would dispose+initialize after each render
+        [||])
     counterState.current
 
 let slowCounter = elmishView "SlowCounter" ByRef <| fun () ->

@@ -159,9 +159,9 @@ Remarks:
 
 * You might have to limit the number of messages displayed if you want to keep performances in the long run. Without doing anything more, limiting to `1000` messages should give you very good performance if only one message really render in the DOM each time.
 * The times won't update correctly but you can ignore that as we'll tackle it in the next step.
-* If you navigate between channels you'll notice React errors in the console and weird things happening, let's find why and solve them.
+* If you navigate between the *Demo* and *About* channels you'll notice React errors in the console and weird things happening, let's find why and solve them.
 
-## Step 5: Rendering the dates with useEffect and useState
+## Step 5: Rendering the dates with `useEffect` and `useState`
 
 *You can fast-forward here by doing `git checkout workshop-step-4` or by looking at what you're missing in the [workshop-step-4](https://github.com/vbfox/SAFE-Chat-workshop/tree/workshop-step-4) branch*
 

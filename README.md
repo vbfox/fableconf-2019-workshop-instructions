@@ -42,7 +42,7 @@ To clear the server database (normally not needed): remove `src/Server/CHAT_DATA
 * We'll also introduce the [state](https://reactjs.org/docs/hooks-state.html) and [effect](https://reactjs.org/docs/hooks-effect.html) hooks
 * [My PR to optimize the SAFE-BookStore sample](https://github.com/SAFE-Stack/SAFE-BookStore/pull/393)
 * My Fable:React blogs ([Part 1](https://blog.vbfox.net/2018/02/06/fable-react-1-react-in-fable-land.html) and [Part 2](https://blog.vbfox.net/2018/02/08/fable-react-2-optimizing-react.html)) 🥚🐣🐤☠
-* My [FableConf 2018 Talk](https://www.youtube.com/watch?v=9VJoaNoutm4)
+* My [FableConf 2018 Talk in video](https://www.youtube.com/watch?v=9VJoaNoutm4) or just [the slides](https://vbfox.github.io/FableConf2018ReactPerf/#/).
 
 ## The Workshop
 

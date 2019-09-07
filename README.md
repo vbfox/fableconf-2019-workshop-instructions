@@ -1,5 +1,7 @@
 # SAFE-Chat optimization workshop
 
+Text for this workshop is available at [https://github.com/vbfox/fableconf-2019-workshop-instructions](https://github.com/vbfox/fableconf-2019-workshop-instructions/blob/master/README.md)
+
 ![SAFE-Chat](FsChat-login.gif "Channel view")
 
 ## Requirements
